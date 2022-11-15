@@ -37,6 +37,8 @@
 
 ## 実行手順
 
+npm install
+
 ### dev
 
 npx ts-node src/index.ts

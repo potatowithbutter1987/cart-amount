@@ -1,6 +1,8 @@
-export const tax: number = 0.08;
+export const TAX = {
+    CONSUMPTION: 0.08
+} as const;
 
-export const itemList = [
+export const ITEM_LIST = [
     {
         name: 'りんご',
         qty: 0,
@@ -16,4 +18,4 @@ export const itemList = [
         qty: 0,
         amount: 498
     }
-];
+] as const;
