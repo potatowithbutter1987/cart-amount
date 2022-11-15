@@ -46,3 +46,7 @@ npx ts-node src/index.ts
 ### deploy
 
 npx tsc
+
+### test
+
+npx jest

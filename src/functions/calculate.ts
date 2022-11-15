@@ -15,25 +15,29 @@ export class Calculate {
 		const itemNames = itemData.split(/\r\n|\n/).filter((f) => f !== "");
 
 		for (const itemName of itemNames) {
-			const item = ITEM_LIST.filter((i) => i.name === itemName);
-
-			this.addDetailItem(item, itemName);
+			const masterItem = ITEM_LIST.filter((i) => i.name === itemName);
+			this.addDetailItem(masterItem, itemName);
 		}
 		return this.detailItems;
 	}
 
-	private addDetailItem(item: detailItem[], itemName: string): void {
-		if (this.existsList(item)) {
-			const copyItem = { ...item[0] };
+	private addDetailItem(masterItem: detailItem[], itemName: string): void {
+		if (this.existsList(masterItem)) { // マスターに存在する商品
+			const copyItem = { ...masterItem[0] };
 			const detailItem = this.detailItems.filter((d) => d.name === copyItem.name);
 			if (this.existsList(detailItem)) {
 				detailItem[0].qty = ++detailItem[0].qty;
 				detailItem[0].amount = detailItem[0].qty * copyItem.amount;
-			} else {
-				++copyItem.qty;
-				this.detailItems.push(copyItem);
+				return;
 			}
-		} else {
+
+			++copyItem.qty;
+			this.detailItems.push(copyItem);
+		} else { // マスターに存在しない商品
+			const detailItem = this.detailItems.filter((d) => d.name === itemName);
+			if (this.existsList(detailItem)) {
+				return;
+			}
 			this.detailItems.push({
 				name: itemName,
 				qty: 1,
