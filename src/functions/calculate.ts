@@ -2,7 +2,7 @@ import { TAX, ITEM_LIST } from "../config/constant";
 import { detailItem, detail } from "../models/interface";
 
 export class Calculate {
-	#detailItems: detailItem[] = [];
+	private detailItems: detailItem[] = [];
 
 	public getCartAmount(itemData: string): object {
 		const detailItems = this.getDetailItems(itemData);
@@ -14,43 +14,37 @@ export class Calculate {
 	private getDetailItems(itemData: string): detailItem[] {
 		const itemNames = itemData.split(/\r\n|\n/).filter((f) => f !== "");
 
-		const detailItems: detailItem[] = [];
 		for (const itemName of itemNames) {
 			const item = ITEM_LIST.filter((i) => i.name === itemName);
 
-			if (this.existsList(item)) {
-				const copyItem = {...item[0]};
-				const detailItem = detailItems.filter((d) => d.name === copyItem.name);
-				if (this.existsList(detailItem)) {
-					detailItem[0].qty = ++detailItem[0].qty;
-					detailItem[0].amount = detailItem[0].qty * copyItem.amount;
-				} else {
-					++copyItem.qty;
-					detailItems.push(copyItem);
-				}
-			} else {
-				detailItems.push({
-					name: itemName,
-					qty: 1,
-					amount: 0,
-				});
-				// this.#addDetailItems({
-				//     name: itemName,
-				//     qty: 1,
-				//     amount: 0,
-				// });
-			}
+			this.addDetailItem(item, itemName);
 		}
-		return detailItems;
+		return this.detailItems;
+	}
+
+	private addDetailItem(item: detailItem[], itemName: string): void {
+		if (this.existsList(item)) {
+			const copyItem = { ...item[0] };
+			const detailItem = this.detailItems.filter((d) => d.name === copyItem.name);
+			if (this.existsList(detailItem)) {
+				detailItem[0].qty = ++detailItem[0].qty;
+				detailItem[0].amount = detailItem[0].qty * copyItem.amount;
+			} else {
+				++copyItem.qty;
+				this.detailItems.push(copyItem);
+			}
+		} else {
+			this.detailItems.push({
+				name: itemName,
+				qty: 1,
+				amount: 0,
+			});
+		}
 	}
 
 	private existsList(items: any[]): number {
 		return items.length;
 	}
-
-	//   #addDetailItems(detailItem:detailItem):void {
-	//     this.#detailItems.push(detailItem);
-	//   }
 
 	private getResult(detailItems: detailItem[]): detail {
 		const result: detail = {
