@@ -1,4 +1,4 @@
-import { TAX, ITEM_LIST } from "../config/constant";
+import { TAX, DISCOUNT, ITEM_LIST } from "../config/constant";
 import { detailItem, detail } from "../models/interface";
 
 export class Calculate {
@@ -6,7 +6,8 @@ export class Calculate {
 
 	public getCartAmount(itemData: string): object {
 		const detailItems = this.getDetailItems(itemData);
-		const result = this.getResult(detailItems);
+		const detailItemsWithDiscount = this.addDiscountForDetailItem(detailItems);
+		const result = this.getResult(detailItemsWithDiscount);
 
 		return result;
 	}
@@ -26,16 +27,17 @@ export class Calculate {
 			const copyItem = { ...masterItem[0] };
 			const detailItem = this.detailItems.filter((d) => d.name === copyItem.name);
 			if (this.existsList(detailItem)) {
-				detailItem[0].qty = ++detailItem[0].qty;
+				detailItem[0].qty = ++detailItem[0].qty!;
 				detailItem[0].amount = detailItem[0].qty * copyItem.amount;
 				return;
 			}
 
-			++copyItem.qty;
+			++copyItem.qty!;
 			this.detailItems.push(copyItem);
 		} else { // マスターに存在しない商品
 			const detailItem = this.detailItems.filter((d) => d.name === itemName);
 			if (this.existsList(detailItem)) {
+				// detailItem[0].qty = ++detailItem[0].qty;
 				return;
 			}
 			this.detailItems.push({
@@ -44,6 +46,26 @@ export class Calculate {
 				amount: 0,
 			});
 		}
+	}
+
+	private addDiscountForDetailItem(detailItems: detailItem[]): detailItem[] {
+		const result = [];
+		for (const detailItem of detailItems) {
+			if (detailItem.qty! >= 3 ) {
+				result.push(detailItem);
+
+				// 10%割引
+				const calcDiscrount = Math.floor(detailItem.amount! * DISCOUNT.BUY_BULK_3) * -1;
+				result.push({
+					name: `${detailItem.name}まとめ買い割引`,
+					amount: calcDiscrount,
+				});
+				continue;
+			}
+			result.push(detailItem);
+		}
+		
+		return result;
 	}
 
 	private existsList(items: any[]): number {

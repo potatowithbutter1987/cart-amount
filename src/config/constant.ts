@@ -2,6 +2,10 @@ export const TAX = {
     CONSUMPTION: 0.08
 } as const;
 
+export const DISCOUNT = {
+    BUY_BULK_3: 0.1
+} as const;
+
 export const ITEM_LIST = [
     {
         name: 'りんご',

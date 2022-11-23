@@ -1,6 +1,6 @@
 export type detailItem  = {
 	name: string;
-	qty: number;
+	qty?: number;
 	amount: number;
 };
 
